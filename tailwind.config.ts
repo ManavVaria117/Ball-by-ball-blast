@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -56,6 +59,14 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        cricket: {
+          boundary: "hsl(var(--cricket-boundary))",
+          six: "hsl(var(--cricket-six))",
+          wicket: "hsl(var(--cricket-wicket))",
+          wide: "hsl(var(--cricket-wide))",
+          noball: "hsl(var(--cricket-noball))",
+          dot: "hsl(var(--cricket-dot))",
         },
       },
       borderRadius: {
