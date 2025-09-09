@@ -21,6 +21,9 @@ const CricketScorer = () => {
   });
   const [teamAPlayers, setTeamAPlayers] = useState<string[]>(Array(11).fill(''));
   const [teamBPlayers, setTeamBPlayers] = useState<string[]>(Array(11).fill(''));
+  const [showStrikerDialog, setShowStrikerDialog] = useState(false);
+  const [selectedStriker, setSelectedStriker] = useState('');
+  const [selectedNonStriker, setSelectedNonStriker] = useState('');
 
   // Generate sample players for a team
   const generatePlayers = (teamName: string, playerNames: string[]): Player[] => {
@@ -35,8 +38,16 @@ const CricketScorer = () => {
     }));
   };
 
-  // Initialize a new match
-  const startNewMatch = () => {
+  // Check if all players are filled
+  const areAllPlayersFilled = () => {
+    return teamAPlayers.every(player => player.trim() !== '') && 
+           teamBPlayers.every(player => player.trim() !== '');
+  };
+
+  // Handle striker selection and start match
+  const handleStrikerSelection = () => {
+    if (!selectedStriker || !selectedNonStriker) return;
+    
     const newMatchId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const newMatch: Match = {
       id: newMatchId,
@@ -65,12 +76,8 @@ const CricketScorer = () => {
       wickets: 0,
       totalBalls: 0,
       currentOverBalls: [],
-      strikerId: setupData.tossWinner === setupData.teamA 
-        ? (setupData.tossDecision === 'bat' ? setupData.teamA.toLowerCase() + '_p1' : setupData.teamB.toLowerCase() + '_p1')
-        : (setupData.tossDecision === 'bat' ? setupData.teamB.toLowerCase() + '_p1' : setupData.teamA.toLowerCase() + '_p1'),
-      nonStrikerId: setupData.tossWinner === setupData.teamA 
-        ? (setupData.tossDecision === 'bat' ? setupData.teamA.toLowerCase() + '_p2' : setupData.teamB.toLowerCase() + '_p2')
-        : (setupData.tossDecision === 'bat' ? setupData.teamB.toLowerCase() + '_p2' : setupData.teamA.toLowerCase() + '_p2'),
+      strikerId: selectedStriker,
+      nonStrikerId: selectedNonStriker,
       bowlerId: setupData.tossWinner === setupData.teamA 
         ? (setupData.tossDecision === 'bat' ? setupData.teamB.toLowerCase() + '_p1' : setupData.teamA.toLowerCase() + '_p1')
         : (setupData.tossDecision === 'bat' ? setupData.teamA.toLowerCase() + '_p1' : setupData.teamB.toLowerCase() + '_p1'),
@@ -81,7 +88,15 @@ const CricketScorer = () => {
     
     setMatch(newMatch);
     setMatchId(newMatchId);
+    setShowStrikerDialog(false);
     setCurrentScreen('scoring');
+  };
+
+  // Initialize a new match (legacy function - will be replaced by striker selection)
+  const startNewMatch = () => {
+    if (areAllPlayersFilled()) {
+      setShowStrikerDialog(true);
+    }
   };
 
   // Process a ball (runs scored)
@@ -429,12 +444,118 @@ const CricketScorer = () => {
               <Button variant="outline" onClick={() => setCurrentScreen('setup')} className="flex-1">
                 Back to Setup
               </Button>
-              <Button variant="hero" onClick={startNewMatch} className="flex-1">
-                Start Scoring
+              <Button 
+                variant="hero" 
+                onClick={startNewMatch} 
+                disabled={!areAllPlayersFilled()}
+                className="flex-1"
+              >
+                {areAllPlayersFilled() ? 'Select Opening Batsmen' : 'Fill All Player Names'}
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Striker Selection Dialog */}
+        <Dialog open={showStrikerDialog} onOpenChange={(open) => {
+          setShowStrikerDialog(open);
+          if (!open) {
+            setSelectedStriker('');
+            setSelectedNonStriker('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Opening Batsmen</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                Choose the striker and non-striker for {setupData.tossWinner === setupData.teamA 
+                  ? (setupData.tossDecision === 'bat' ? setupData.teamA : setupData.teamB)
+                  : (setupData.tossDecision === 'bat' ? setupData.teamB : setupData.teamA)}
+              </p>
+              
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Striker (faces first ball)
+                  </label>
+                  <Select value={selectedStriker} onValueChange={setSelectedStriker}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select striker" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(setupData.tossWinner === setupData.teamA 
+                        ? (setupData.tossDecision === 'bat' ? teamAPlayers : teamBPlayers)
+                        : (setupData.tossDecision === 'bat' ? teamBPlayers : teamAPlayers)
+                      ).map((player, index) => {
+                        if (!player.trim()) return null;
+                        const playerId = `${(setupData.tossWinner === setupData.teamA 
+                          ? (setupData.tossDecision === 'bat' ? setupData.teamA : setupData.teamB)
+                          : (setupData.tossDecision === 'bat' ? setupData.teamB : setupData.teamA)
+                        ).toLowerCase()}_p${index + 1}`;
+                        return (
+                          <SelectItem key={playerId} value={playerId}>
+                            {player}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Non-Striker</label>
+                  <Select value={selectedNonStriker} onValueChange={setSelectedNonStriker}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select non-striker" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(setupData.tossWinner === setupData.teamA 
+                        ? (setupData.tossDecision === 'bat' ? teamAPlayers : teamBPlayers)
+                        : (setupData.tossDecision === 'bat' ? teamBPlayers : teamAPlayers)
+                      ).map((player, index) => {
+                        if (!player.trim()) return null;
+                        const playerId = `${(setupData.tossWinner === setupData.teamA 
+                          ? (setupData.tossDecision === 'bat' ? setupData.teamA : setupData.teamB)
+                          : (setupData.tossDecision === 'bat' ? setupData.teamB : setupData.teamA)
+                        ).toLowerCase()}_p${index + 1}`;
+                        
+                        // Don't show the same player as striker
+                        if (playerId === selectedStriker) return null;
+                        
+                        return (
+                          <SelectItem key={playerId} value={playerId}>
+                            {player}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowStrikerDialog(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="hero" 
+                  onClick={handleStrikerSelection}
+                  disabled={!selectedStriker || !selectedNonStriker}
+                  className="flex-1"
+                >
+                  Start Match
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
