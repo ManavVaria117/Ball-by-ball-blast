@@ -24,6 +24,8 @@ const CricketScorer = () => {
   const [showStrikerDialog, setShowStrikerDialog] = useState(false);
   const [selectedStriker, setSelectedStriker] = useState('');
   const [selectedNonStriker, setSelectedNonStriker] = useState('');
+  const [showBowlerDialog, setShowBowlerDialog] = useState(false);
+  const [selectedBowler, setSelectedBowler] = useState('');
 
   // Generate sample players for a team
   const generatePlayers = (teamName: string, playerNames: string[]): Player[] => {
@@ -44,9 +46,16 @@ const CricketScorer = () => {
            teamBPlayers.every(player => player.trim() !== '');
   };
 
-  // Handle striker selection and start match
+  // Handle striker selection and show bowler dialog
   const handleStrikerSelection = () => {
     if (!selectedStriker || !selectedNonStriker) return;
+    setShowStrikerDialog(false);
+    setShowBowlerDialog(true);
+  };
+
+  // Handle bowler selection and start match
+  const handleBowlerSelection = () => {
+    if (!selectedBowler) return;
     
     const newMatchId = Math.random().toString(36).substring(2, 8).toUpperCase();
     const newMatch: Match = {
@@ -78,9 +87,7 @@ const CricketScorer = () => {
       currentOverBalls: [],
       strikerId: selectedStriker,
       nonStrikerId: selectedNonStriker,
-      bowlerId: setupData.tossWinner === setupData.teamA 
-        ? (setupData.tossDecision === 'bat' ? setupData.teamB.toLowerCase() + '_p1' : setupData.teamA.toLowerCase() + '_p1')
-        : (setupData.tossDecision === 'bat' ? setupData.teamA.toLowerCase() + '_p1' : setupData.teamB.toLowerCase() + '_p1'),
+      bowlerId: selectedBowler,
       history: [],
       target: 0,
       createdAt: Date.now()
@@ -88,7 +95,7 @@ const CricketScorer = () => {
     
     setMatch(newMatch);
     setMatchId(newMatchId);
-    setShowStrikerDialog(false);
+    setShowBowlerDialog(false);
     setCurrentScreen('scoring');
   };
 
@@ -459,7 +466,7 @@ const CricketScorer = () => {
         {/* Striker Selection Dialog */}
         <Dialog open={showStrikerDialog} onOpenChange={(open) => {
           setShowStrikerDialog(open);
-          if (!open) {
+          if (!open && !showBowlerDialog) {
             setSelectedStriker('');
             setSelectedNonStriker('');
           }
@@ -548,6 +555,77 @@ const CricketScorer = () => {
                   variant="hero" 
                   onClick={handleStrikerSelection}
                   disabled={!selectedStriker || !selectedNonStriker}
+                  className="flex-1"
+                >
+                  Next: Select Bowler
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bowler Selection Dialog */}
+        <Dialog open={showBowlerDialog} onOpenChange={(open) => {
+          setShowBowlerDialog(open);
+          if (!open) {
+            setSelectedBowler('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Opening Bowler</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                Choose the opening bowler for {setupData.tossWinner === setupData.teamA 
+                  ? (setupData.tossDecision === 'bat' ? setupData.teamB : setupData.teamA)
+                  : (setupData.tossDecision === 'bat' ? setupData.teamA : setupData.teamB)}
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Opening Bowler
+                </label>
+                <Select value={selectedBowler} onValueChange={setSelectedBowler}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select bowler" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(setupData.tossWinner === setupData.teamA 
+                      ? (setupData.tossDecision === 'bat' ? teamBPlayers : teamAPlayers)
+                      : (setupData.tossDecision === 'bat' ? teamAPlayers : teamBPlayers)
+                    ).map((player, index) => {
+                      if (!player.trim()) return null;
+                      const playerId = `${(setupData.tossWinner === setupData.teamA 
+                        ? (setupData.tossDecision === 'bat' ? setupData.teamB : setupData.teamA)
+                        : (setupData.tossDecision === 'bat' ? setupData.teamA : setupData.teamB)
+                      ).toLowerCase()}_p${index + 1}`;
+                      return (
+                        <SelectItem key={playerId} value={playerId}>
+                          {player}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowBowlerDialog(false);
+                    setShowStrikerDialog(true);
+                  }}
+                  className="flex-1"
+                >
+                  Back
+                </Button>
+                <Button 
+                  variant="hero" 
+                  onClick={handleBowlerSelection}
+                  disabled={!selectedBowler}
                   className="flex-1"
                 >
                   Start Match
