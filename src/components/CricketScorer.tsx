@@ -19,12 +19,14 @@ const CricketScorer = () => {
     tossWinner: '',
     tossDecision: 'bat' as 'bat' | 'bowl'
   });
+  const [teamAPlayers, setTeamAPlayers] = useState<string[]>(Array(11).fill(''));
+  const [teamBPlayers, setTeamBPlayers] = useState<string[]>(Array(11).fill(''));
 
   // Generate sample players for a team
-  const generatePlayers = (teamName: string): Player[] => {
+  const generatePlayers = (teamName: string, playerNames: string[]): Player[] => {
     return Array.from({ length: 11 }, (_, i) => ({
       id: `${teamName.toLowerCase()}_p${i + 1}`,
-      name: `${teamName} Player ${i + 1}`,
+      name: playerNames[i] || `${teamName} Player ${i + 1}`,
       runs: 0,
       balls: 0,
       fours: 0,
@@ -40,11 +42,11 @@ const CricketScorer = () => {
       id: newMatchId,
       teamA: {
         name: setupData.teamA,
-        players: generatePlayers(setupData.teamA)
+        players: generatePlayers(setupData.teamA, teamAPlayers)
       },
       teamB: {
         name: setupData.teamB,
-        players: generatePlayers(setupData.teamB)
+        players: generatePlayers(setupData.teamB, teamBPlayers)
       },
       overs: setupData.overs,
       toss: {
@@ -351,15 +353,89 @@ const CricketScorer = () => {
             </Button>
             <Button 
               variant="hero" 
-              onClick={startNewMatch}
+              onClick={() => setCurrentScreen('players')}
               disabled={!setupData.teamA || !setupData.teamB || !setupData.tossWinner}
               className="flex-1"
             >
-              Start Scoring
+              Next: Add Players
             </Button>
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+
+  const renderPlayersScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/95 p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Add Team Players</CardTitle>
+            <p className="text-center text-muted-foreground">Enter player names for both teams</p>
+          </CardHeader>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Team A Players */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">{setupData.teamA}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {teamAPlayers.map((player, index) => (
+                <div key={index} className="space-y-1">
+                  <label className="text-sm font-medium">Player {index + 1}</label>
+                  <Input
+                    value={player}
+                    onChange={(e) => {
+                      const newPlayers = [...teamAPlayers];
+                      newPlayers[index] = e.target.value;
+                      setTeamAPlayers(newPlayers);
+                    }}
+                    placeholder={`${setupData.teamA} Player ${index + 1}`}
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Team B Players */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">{setupData.teamB}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {teamBPlayers.map((player, index) => (
+                <div key={index} className="space-y-1">
+                  <label className="text-sm font-medium">Player {index + 1}</label>
+                  <Input
+                    value={player}
+                    onChange={(e) => {
+                      const newPlayers = [...teamBPlayers];
+                      newPlayers[index] = e.target.value;
+                      setTeamBPlayers(newPlayers);
+                    }}
+                    placeholder={`${setupData.teamB} Player ${index + 1}`}
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="shadow-card">
+          <CardContent className="p-4">
+            <div className="flex gap-4">
+              <Button variant="outline" onClick={() => setCurrentScreen('setup')} className="flex-1">
+                Back to Setup
+              </Button>
+              <Button variant="hero" onClick={startNewMatch} className="flex-1">
+                Start Scoring
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 
@@ -600,6 +676,8 @@ const CricketScorer = () => {
       return renderHomeScreen();
     case 'setup':
       return renderSetupScreen();
+    case 'players':
+      return renderPlayersScreen();
     case 'scoring':
       return renderScoringScreen();
     case 'scorecard':

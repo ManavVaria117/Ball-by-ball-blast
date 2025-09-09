@@ -59,4 +59,4 @@ export interface Match {
   createdAt: number;
 }
 
-export type Screen = 'home' | 'setup' | 'scoring' | 'finished' | 'scorecard';
+export type Screen = 'home' | 'setup' | 'players' | 'scoring' | 'finished' | 'scorecard';
