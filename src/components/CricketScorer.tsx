@@ -224,6 +224,14 @@ const CricketScorer = () => {
     return ((remaining / ballsLeft) * 6).toFixed(2);
   };
 
+  // Undo last ball
+  const undoLastBall = () => {
+    if (!match || match.history.length === 0) return;
+    
+    const previousState = match.history[match.history.length - 1];
+    setMatch(previousState);
+  };
+
   const renderHomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/95 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-card">
@@ -523,7 +531,12 @@ const CricketScorer = () => {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="h-12">
+            <Button 
+              variant="outline" 
+              className="h-12"
+              onClick={undoLastBall}
+              disabled={!match || match.history.length === 0}
+            >
               <RotateCcw className="h-4 w-4 mr-2" />
               Undo Last Ball
             </Button>
