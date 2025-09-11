@@ -206,6 +206,7 @@ const CricketScorer = () => {
       const bowler = bowlingTeam.players.find(p => p.id === match.bowlerId);
       if (bowler) {
         bowler.balls++;
+        bowler.wickets = (bowler.wickets || 0) + 1;
       }
     }
 

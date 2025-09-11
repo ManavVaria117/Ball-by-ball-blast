@@ -5,6 +5,7 @@ export interface Player {
   balls: number;
   fours: number;
   sixes: number;
+  wickets?: number;
   isOut: boolean;
   dismissalType?: string;
   dismissedBy?: string;
