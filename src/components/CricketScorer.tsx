@@ -693,105 +693,6 @@ const CricketScorer = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Next Bowler Selection Dialog */}
-        <Dialog open={showNextBowlerDialog} onOpenChange={(open) => {
-          setShowNextBowlerDialog(open);
-          if (!open) {
-            setSelectedNextBowler('');
-          }
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center">Select Next Bowler</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Over completed! Choose the bowler for the next over.
-              </p>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Next Bowler
-                </label>
-                <Select value={selectedNextBowler} onValueChange={setSelectedNextBowler}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select bowler" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {match && getCurrentBowlingTeam()?.players.map((player) => (
-                      <SelectItem key={player.id} value={player.id}>
-                        {player.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button 
-                  variant="hero" 
-                  onClick={handleNextBowlerSelection}
-                  disabled={!selectedNextBowler}
-                  className="w-full"
-                >
-                  Continue Match
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Next Batsman Selection Dialog */}
-        <Dialog open={showNextBatsmanDialog} onOpenChange={(open) => {
-          setShowNextBatsmanDialog(open);
-          if (!open) {
-            setSelectedNextBatsman('');
-          }
-        }}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center">Select Next Batsman</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                A batsman is out! Choose the next batsman to come in.
-              </p>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Next Batsman
-                </label>
-                <Select value={selectedNextBatsman} onValueChange={setSelectedNextBatsman}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select batsman" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {match && getCurrentBattingTeam()?.players
-                      .filter(p => !p.isOut && p.id !== match.nonStrikerId)
-                      .map((player) => (
-                        <SelectItem key={player.id} value={player.id}>
-                          {player.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button 
-                  variant="hero" 
-                  onClick={handleNextBatsmanSelection}
-                  disabled={!selectedNextBatsman}
-                  className="w-full"
-                >
-                  Continue Match
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
@@ -979,6 +880,106 @@ const CricketScorer = () => {
             </Button>
           </div>
         </div>
+
+        {/* Next Bowler Selection Dialog */}
+        <Dialog open={showNextBowlerDialog} onOpenChange={(open) => {
+          setShowNextBowlerDialog(open);
+          if (!open) {
+            setSelectedNextBowler('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Next Bowler</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                Over completed! Choose the bowler for the next over.
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Next Bowler
+                </label>
+                <Select value={selectedNextBowler} onValueChange={setSelectedNextBowler}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select bowler" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getCurrentBowlingTeam()?.players.map((player) => (
+                      <SelectItem key={player.id} value={player.id}>
+                        {player.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="hero" 
+                  onClick={handleNextBowlerSelection}
+                  disabled={!selectedNextBowler}
+                  className="w-full"
+                >
+                  Continue Match
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Next Batsman Selection Dialog */}
+        <Dialog open={showNextBatsmanDialog} onOpenChange={(open) => {
+          setShowNextBatsmanDialog(open);
+          if (!open) {
+            setSelectedNextBatsman('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Next Batsman</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                A batsman is out! Choose the next batsman to come in.
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Next Batsman
+                </label>
+                <Select value={selectedNextBatsman} onValueChange={setSelectedNextBatsman}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select batsman" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getCurrentBattingTeam()?.players
+                      .filter(p => !p.isOut && p.id !== match.nonStrikerId)
+                      .map((player) => (
+                        <SelectItem key={player.id} value={player.id}>
+                          {player.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="hero" 
+                  onClick={handleNextBatsmanSelection}
+                  disabled={!selectedNextBatsman}
+                  className="w-full"
+                >
+                  Continue Match
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   };
