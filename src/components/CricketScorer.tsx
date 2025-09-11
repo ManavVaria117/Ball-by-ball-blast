@@ -26,6 +26,10 @@ const CricketScorer = () => {
   const [selectedNonStriker, setSelectedNonStriker] = useState('');
   const [showBowlerDialog, setShowBowlerDialog] = useState(false);
   const [selectedBowler, setSelectedBowler] = useState('');
+  const [showNextBowlerDialog, setShowNextBowlerDialog] = useState(false);
+  const [selectedNextBowler, setSelectedNextBowler] = useState('');
+  const [showNextBatsmanDialog, setShowNextBatsmanDialog] = useState(false);
+  const [selectedNextBatsman, setSelectedNextBatsman] = useState('');
 
   // Generate sample players for a team
   const generatePlayers = (teamName: string, playerNames: string[]): Player[] => {
@@ -162,8 +166,11 @@ const CricketScorer = () => {
     }
 
     // End of over
-    if (updatedMatch.totalBalls % 6 === 0) {
+    if (updatedMatch.totalBalls % 6 === 0 && updatedMatch.totalBalls < updatedMatch.overs * 6) {
       updatedMatch.currentOverBalls = [];
+      setMatch(updatedMatch);
+      setShowNextBowlerDialog(true);
+      return;
     }
 
     setMatch(updatedMatch);
@@ -203,10 +210,14 @@ const CricketScorer = () => {
     };
     updatedMatch.currentOverBalls = [...match.currentOverBalls, ball];
 
-    // Find next batsman
-    const nextBatsman = battingTeam.players.find(p => !p.isOut && p.id !== match.nonStrikerId);
-    if (nextBatsman) {
-      updatedMatch.strikerId = nextBatsman.id;
+    // Find next batsman - show dialog if more than one available
+    const availableBatsmen = battingTeam.players.filter(p => !p.isOut && p.id !== match.nonStrikerId);
+    if (availableBatsmen.length > 1) {
+      setMatch(updatedMatch);
+      setShowNextBatsmanDialog(true);
+      return;
+    } else if (availableBatsmen.length === 1) {
+      updatedMatch.strikerId = availableBatsmen[0].id;
     }
 
     setMatch(updatedMatch);
@@ -254,6 +265,30 @@ const CricketScorer = () => {
     
     const previousState = match.history[match.history.length - 1];
     setMatch(previousState);
+  };
+
+  // Handle next bowler selection
+  const handleNextBowlerSelection = () => {
+    if (!selectedNextBowler || !match) return;
+    
+    const updatedMatch = { ...match };
+    updatedMatch.bowlerId = selectedNextBowler;
+    
+    setMatch(updatedMatch);
+    setShowNextBowlerDialog(false);
+    setSelectedNextBowler('');
+  };
+
+  // Handle next batsman selection
+  const handleNextBatsmanSelection = () => {
+    if (!selectedNextBatsman || !match) return;
+    
+    const updatedMatch = { ...match };
+    updatedMatch.strikerId = selectedNextBatsman;
+    
+    setMatch(updatedMatch);
+    setShowNextBatsmanDialog(false);
+    setSelectedNextBatsman('');
   };
 
   const renderHomeScreen = () => (
@@ -629,6 +664,106 @@ const CricketScorer = () => {
                   className="flex-1"
                 >
                   Start Match
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Next Bowler Selection Dialog */}
+        <Dialog open={showNextBowlerDialog} onOpenChange={(open) => {
+          setShowNextBowlerDialog(open);
+          if (!open) {
+            setSelectedNextBowler('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Next Bowler</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                Over completed! Choose the bowler for the next over.
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Next Bowler
+                </label>
+                <Select value={selectedNextBowler} onValueChange={setSelectedNextBowler}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select bowler" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {match && getCurrentBowlingTeam()?.players.map((player) => (
+                      <SelectItem key={player.id} value={player.id}>
+                        {player.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="hero" 
+                  onClick={handleNextBowlerSelection}
+                  disabled={!selectedNextBowler}
+                  className="w-full"
+                >
+                  Continue Match
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Next Batsman Selection Dialog */}
+        <Dialog open={showNextBatsmanDialog} onOpenChange={(open) => {
+          setShowNextBatsmanDialog(open);
+          if (!open) {
+            setSelectedNextBatsman('');
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Select Next Batsman</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                A batsman is out! Choose the next batsman to come in.
+              </p>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Next Batsman
+                </label>
+                <Select value={selectedNextBatsman} onValueChange={setSelectedNextBatsman}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select batsman" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {match && getCurrentBattingTeam()?.players
+                      .filter(p => !p.isOut && p.id !== match.nonStrikerId)
+                      .map((player) => (
+                        <SelectItem key={player.id} value={player.id}>
+                          {player.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="hero" 
+                  onClick={handleNextBatsmanSelection}
+                  disabled={!selectedNextBatsman}
+                  className="w-full"
+                >
+                  Continue Match
                 </Button>
               </div>
             </div>
