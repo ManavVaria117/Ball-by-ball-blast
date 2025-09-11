@@ -158,16 +158,22 @@ const CricketScorer = () => {
       updatedMatch.totalBalls++;
     }
 
-    // Rotate strike on odd runs or end of over
-    if (runs % 2 === 1 || updatedMatch.totalBalls % 6 === 0) {
+    // Rotate strike on odd runs (but not at end of over)
+    if (runs % 2 === 1 && updatedMatch.totalBalls % 6 !== 0) {
       const temp = updatedMatch.strikerId;
       updatedMatch.strikerId = updatedMatch.nonStrikerId;
       updatedMatch.nonStrikerId = temp;
     }
 
-    // End of over
+    // End of over - check before setting match state
     if (updatedMatch.totalBalls % 6 === 0 && updatedMatch.totalBalls < updatedMatch.overs * 6) {
+      console.log('Over completed! Total balls:', updatedMatch.totalBalls, 'Showing next bowler dialog');
       updatedMatch.currentOverBalls = [];
+      // Rotate strike at end of over
+      const temp = updatedMatch.strikerId;
+      updatedMatch.strikerId = updatedMatch.nonStrikerId;
+      updatedMatch.nonStrikerId = temp;
+      
       setMatch(updatedMatch);
       setShowNextBowlerDialog(true);
       return;
@@ -210,6 +216,16 @@ const CricketScorer = () => {
     };
     updatedMatch.currentOverBalls = [...match.currentOverBalls, ball];
 
+    // Check if over is complete after wicket
+    if (updatedMatch.totalBalls % 6 === 0 && updatedMatch.totalBalls < updatedMatch.overs * 6) {
+      console.log('Over completed after wicket! Total balls:', updatedMatch.totalBalls);
+      updatedMatch.currentOverBalls = [];
+      // Rotate strike at end of over
+      const temp = updatedMatch.strikerId;
+      updatedMatch.strikerId = updatedMatch.nonStrikerId;
+      updatedMatch.nonStrikerId = temp;
+    }
+
     // Find next batsman - show dialog if more than one available
     const availableBatsmen = battingTeam.players.filter(p => !p.isOut && p.id !== match.nonStrikerId);
     if (availableBatsmen.length > 1) {
@@ -218,6 +234,13 @@ const CricketScorer = () => {
       return;
     } else if (availableBatsmen.length === 1) {
       updatedMatch.strikerId = availableBatsmen[0].id;
+    }
+
+    // Check if we need to show next bowler dialog after handling wicket
+    if (updatedMatch.totalBalls % 6 === 0 && updatedMatch.totalBalls < updatedMatch.overs * 6) {
+      setMatch(updatedMatch);
+      setShowNextBowlerDialog(true);
+      return;
     }
 
     setMatch(updatedMatch);
