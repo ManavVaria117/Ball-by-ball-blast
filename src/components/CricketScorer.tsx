@@ -991,6 +991,7 @@ const CricketScorer = () => {
     if (!match) return null;
 
     const battingTeam = getCurrentBattingTeam();
+    const bowlingTeam = match.battingTeam === match.teamA.name ? match.teamB : match.teamA;
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-background/95 p-4">
@@ -1012,9 +1013,22 @@ const CricketScorer = () => {
                     ))}
                   </div>
                 </div>
+                
                 <div className="text-center">
                   <div className="text-2xl font-bold">{match.score}/{match.wickets}</div>
                   <div className="text-muted-foreground">({getCurrentOver()} overs)</div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">{bowlingTeam.name} Bowling</h3>
+                  <div className="space-y-2">
+                    {bowlingTeam.players.filter(p => (p.balls || 0) > 0).map(player => (
+                      <div key={player.id} className="flex justify-between items-center p-2 rounded border border-border">
+                        <span className="font-medium">{player.name}</span>
+                        <span className="font-mono">{player.wickets || 0}-{player.runs || 0} ({Math.floor((player.balls || 0) / 6)}.{(player.balls || 0) % 6})</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </CardContent>
