@@ -1004,13 +1004,120 @@ const CricketScorer = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3">{battingTeam?.name} Batting</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left p-2 font-semibold">Batsman</th>
+                          <th className="text-center p-2 font-semibold">R</th>
+                          <th className="text-center p-2 font-semibold">B</th>
+                          <th className="text-center p-2 font-semibold">4s</th>
+                          <th className="text-center p-2 font-semibold">6s</th>
+                          <th className="text-center p-2 font-semibold">SR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {battingTeam?.players.filter(p => p.balls > 0 || p.isOut).map(player => (
+                          <tr key={player.id} className="border-b border-border/50">
+                            <td className="p-2 font-medium">
+                              {player.name} {player.isOut ? '(out)' : ''}
+                            </td>
+                            <td className="text-center p-2 font-mono">{player.runs}</td>
+                            <td className="text-center p-2 font-mono">{player.balls}</td>
+                            <td className="text-center p-2 font-mono">{player.fours}</td>
+                            <td className="text-center p-2 font-mono">{player.sixes}</td>
+                            <td className="text-center p-2 font-mono">
+                              {player.balls > 0 ? ((player.runs / player.balls) * 100).toFixed(2) : '0.00'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Partnerships Section */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Partnerships</h3>
                   <div className="space-y-2">
-                    {battingTeam?.players.filter(p => p.balls > 0 || p.isOut).map(player => (
-                      <div key={player.id} className="flex justify-between items-center p-2 rounded border border-border">
-                        <span className="font-medium">{player.name} {player.isOut ? '(out)' : ''}</span>
-                        <span className="font-mono">{player.runs} ({player.balls}) [{player.fours}x4, {player.sixes}x6]</span>
-                      </div>
-                    ))}
+                    {(() => {
+                      const partnerships = [];
+                      let currentPartnership = { runs: 0, balls: 0, batsmen: [] as string[] };
+                      
+                      // Calculate current partnership between striker and non-striker
+                      if (match.strikerId && match.nonStrikerId && !battingTeam?.players.find(p => p.id === match.strikerId)?.isOut && !battingTeam?.players.find(p => p.id === match.nonStrikerId)?.isOut) {
+                        const striker = battingTeam?.players.find(p => p.id === match.strikerId);
+                        const nonStriker = battingTeam?.players.find(p => p.id === match.nonStrikerId);
+                        if (striker && nonStriker) {
+                          partnerships.push({
+                            batsmen: [striker.name, nonStriker.name],
+                            runs: striker.runs + nonStriker.runs,
+                            balls: striker.balls + nonStriker.balls,
+                            ongoing: true
+                          });
+                        }
+                      }
+                      
+                      return partnerships.length > 0 ? partnerships.map((partnership, index) => (
+                        <div key={index} className="flex justify-between items-center p-2 rounded border border-border">
+                          <span className="font-medium">
+                            {partnership.batsmen.join(' & ')} {partnership.ongoing ? '(ongoing)' : ''}
+                          </span>
+                          <span className="font-mono">{partnership.runs} runs ({partnership.balls} balls)</span>
+                        </div>
+                      )) : (
+                        <div className="p-2 text-muted-foreground text-center">No partnerships yet</div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* Extras Section */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Extras</h3>
+                  <div className="space-y-2">
+                    {(() => {
+                      const extras = {
+                        wides: match.currentOverBalls.filter(ball => ball.isWide).length + 
+                               (match.history || []).reduce((acc, prevMatch) => 
+                                 acc + prevMatch.currentOverBalls.filter(ball => ball.isWide).length, 0),
+                        noballs: match.currentOverBalls.filter(ball => ball.isNoball).length + 
+                                (match.history || []).reduce((acc, prevMatch) => 
+                                  acc + prevMatch.currentOverBalls.filter(ball => ball.isNoball).length, 0),
+                        byes: match.currentOverBalls.filter(ball => ball.isBye).length + 
+                              (match.history || []).reduce((acc, prevMatch) => 
+                                acc + prevMatch.currentOverBalls.filter(ball => ball.isBye).length, 0),
+                        legByes: match.currentOverBalls.filter(ball => ball.isLegBye).length + 
+                                (match.history || []).reduce((acc, prevMatch) => 
+                                  acc + prevMatch.currentOverBalls.filter(ball => ball.isLegBye).length, 0)
+                      };
+                      const totalExtras = extras.wides + extras.noballs + extras.byes + extras.legByes;
+                      
+                      return (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex justify-between p-2 rounded border border-border">
+                            <span>Wides:</span>
+                            <span className="font-mono">{extras.wides}</span>
+                          </div>
+                          <div className="flex justify-between p-2 rounded border border-border">
+                            <span>No Balls:</span>
+                            <span className="font-mono">{extras.noballs}</span>
+                          </div>
+                          <div className="flex justify-between p-2 rounded border border-border">
+                            <span>Byes:</span>
+                            <span className="font-mono">{extras.byes}</span>
+                          </div>
+                          <div className="flex justify-between p-2 rounded border border-border">
+                            <span>Leg Byes:</span>
+                            <span className="font-mono">{extras.legByes}</span>
+                          </div>
+                          <div className="col-span-2 flex justify-between p-2 rounded border border-border bg-muted/50 font-semibold">
+                            <span>Total Extras:</span>
+                            <span className="font-mono">{totalExtras}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
                 
