@@ -31,11 +31,12 @@ const CricketScorer = () => {
   const [showNextBatsmanDialog, setShowNextBatsmanDialog] = useState(false);
   const [selectedNextBatsman, setSelectedNextBatsman] = useState('');
 
-  // Generate sample players for a team
+  // Generate players for a team based on filled names only
   const generatePlayers = (teamName: string, playerNames: string[]): Player[] => {
-    return Array.from({ length: 11 }, (_, i) => ({
+    const filledPlayers = playerNames.filter(name => name.trim() !== '');
+    return filledPlayers.map((name, i) => ({
       id: `${teamName.toLowerCase()}_p${i + 1}`,
-      name: playerNames[i] || `${teamName} Player ${i + 1}`,
+      name: name.trim(),
       runs: 0,
       balls: 0,
       fours: 0,
@@ -44,10 +45,11 @@ const CricketScorer = () => {
     }));
   };
 
-  // Check if all players are filled
-  const areAllPlayersFilled = () => {
-    return teamAPlayers.every(player => player.trim() !== '') && 
-           teamBPlayers.every(player => player.trim() !== '');
+  // Check if at least one player is filled for each team
+  const areMinimumPlayersFilled = () => {
+    const teamAHasPlayers = teamAPlayers.some(player => player.trim() !== '');
+    const teamBHasPlayers = teamBPlayers.some(player => player.trim() !== '');
+    return teamAHasPlayers && teamBHasPlayers;
   };
 
   // Handle striker selection and show bowler dialog
@@ -105,7 +107,7 @@ const CricketScorer = () => {
 
   // Initialize a new match (legacy function - will be replaced by striker selection)
   const startNewMatch = () => {
-    if (areAllPlayersFilled()) {
+    if (areMinimumPlayersFilled()) {
       setShowStrikerDialog(true);
     }
   };
@@ -513,10 +515,10 @@ const CricketScorer = () => {
               <Button 
                 variant="hero" 
                 onClick={startNewMatch} 
-                disabled={!areAllPlayersFilled()}
+                disabled={!areMinimumPlayersFilled()}
                 className="flex-1"
               >
-                {areAllPlayersFilled() ? 'Select Opening Batsmen' : 'Fill All Player Names'}
+                {areMinimumPlayersFilled() ? 'Select Opening Batsmen' : 'Add At Least One Player Per Team'}
               </Button>
             </div>
           </CardContent>
