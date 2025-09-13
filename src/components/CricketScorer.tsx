@@ -779,7 +779,7 @@ const CricketScorer = () => {
                 <div className="p-3 rounded-lg border border-border">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{bowler?.name}</span>
-                    <span className="font-mono">0-{bowler?.runs} ({Math.floor((bowler?.balls || 0) / 6)}.{(bowler?.balls || 0) % 6})</span>
+                    <span className="font-mono">{bowler?.wickets || 0}-{bowler?.runs} ({Math.floor((bowler?.balls || 0) / 6)}.{(bowler?.balls || 0) % 6})</span>
                   </div>
                 </div>
               </CardContent>
