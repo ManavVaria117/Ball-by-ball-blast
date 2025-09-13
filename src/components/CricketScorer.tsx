@@ -15,7 +15,7 @@ const CricketScorer = () => {
   const [setupData, setSetupData] = useState({
     teamA: '',
     teamB: '',
-    overs: 10,
+    overs: 1,
     tossWinner: '',
     tossDecision: 'bat' as 'bat' | 'bowl'
   });
@@ -395,7 +395,7 @@ const CricketScorer = () => {
             <Input
               type="number"
               value={setupData.overs}
-              onChange={(e) => setSetupData(prev => ({ ...prev, overs: parseInt(e.target.value) || 10 }))}
+              onChange={(e) => setSetupData(prev => ({ ...prev, overs: parseInt(e.target.value) || 1 }))}
               min="1"
               max="50"
             />
