@@ -118,8 +118,8 @@ const CricketScorer = () => {
   const processBall = (runs: number, isExtra = false, extraType?: string) => {
     if (!match) return;
 
-    // Save current state for undo
-    const newHistory = [...match.history, { ...match }];
+    // Save current state for undo - create deep copy
+    const newHistory = [...match.history, JSON.parse(JSON.stringify(match))];
 
     // Determine display text based on ball type
     let displayText = runs.toString();
@@ -202,7 +202,7 @@ const CricketScorer = () => {
   const processWicket = () => {
     if (!match || !match.strikerId) return;
 
-    const newHistory = [...match.history, { ...match }];
+    const newHistory = [...match.history, JSON.parse(JSON.stringify(match))];
     const updatedMatch = { ...match };
     updatedMatch.history = newHistory;
     updatedMatch.wickets++;
