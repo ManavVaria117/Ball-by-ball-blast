@@ -5,10 +5,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeftRight, Trophy, Users, RotateCcw, Eye, Target, Clock } from 'lucide-react';
+import { ArrowLeftRight, Trophy, Users, RotateCcw, Eye, Target, Clock, LogOut } from 'lucide-react';
 import { Match, Screen, Player, Ball } from '@/types/cricket';
+import { useAuth } from '@/components/AuthProvider';
 
 const CricketScorer = () => {
+  const { signOut } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [match, setMatch] = useState<Match | null>(null);
   const [matchId, setMatchId] = useState('');
@@ -320,7 +322,15 @@ const CricketScorer = () => {
   const renderHomeScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-background to-background/95 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-card">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center relative">
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute top-4 right-4"
+            onClick={signOut}
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
           <div className="flex items-center justify-center gap-2 mb-4">
             <Trophy className="h-8 w-8 text-primary" />
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
