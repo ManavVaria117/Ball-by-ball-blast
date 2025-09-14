@@ -28,9 +28,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check if Supabase is properly configured
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    const hasSupabaseConfig = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
+    
+    if (!hasSupabaseConfig) {
       // If not configured, treat as authenticated for demo purposes
-      setUser({ id: 'demo-user' } as User)
+      setUser({ id: 'demo-user', email: 'demo@example.com' } as User)
       setLoading(false)
       return
     }
