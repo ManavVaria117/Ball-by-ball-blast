@@ -121,9 +121,21 @@ const CricketScorer = () => {
     // Save current state for undo
     const newHistory = [...match.history, { ...match }];
 
+    // Determine display text based on ball type
+    let displayText = runs.toString();
+    if (extraType === 'wide') {
+      displayText = 'WD';
+    } else if (extraType === 'noball') {
+      displayText = 'NB';
+    } else if (extraType === 'bye') {
+      displayText = 'B';
+    } else if (extraType === 'legbye') {
+      displayText = 'LB';
+    }
+
     const ball: Ball = {
       run: runs,
-      display: runs.toString(),
+      display: displayText,
       isWide: extraType === 'wide',
       isNoball: extraType === 'noball',
       isBye: extraType === 'bye',
