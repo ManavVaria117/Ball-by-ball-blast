@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/components/AuthProvider";
 import LoginPage from "@/components/LoginPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import MatchSpectator from "./pages/MatchSpectator";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const AppContent = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/match/:code" element={<MatchSpectator />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

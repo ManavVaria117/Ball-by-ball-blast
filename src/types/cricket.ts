@@ -5,10 +5,14 @@ export interface Player {
   balls: number;
   fours: number;
   sixes: number;
-  wickets?: number;
+  wickets?: number; // batting-side dismissals not used; keep optional
   isOut: boolean;
   dismissalType?: string;
   dismissedBy?: string;
+  // Bowling (tracked separately to avoid polluting batting stats)
+  bowlRuns?: number;
+  bowlBalls?: number;
+  bowlWickets?: number;
 }
 
 export interface Team {
