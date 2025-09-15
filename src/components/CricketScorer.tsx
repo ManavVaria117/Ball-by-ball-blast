@@ -900,9 +900,10 @@ const CricketScorer = () => {
                   OUT
                 </Button>
                 <Button
-                  variant="destructive"
+                  variant="retire"
                   size="touch"
                   onClick={processRetirement}
+                  className="animate-fade-in"
                 >
                   RETIRE
                 </Button>

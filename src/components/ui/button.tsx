@@ -21,6 +21,7 @@ const buttonVariants = cva(
         six: "bg-cricket-six text-white hover:bg-cricket-six/90 text-lg font-bold shadow-md",
         wicket: "bg-cricket-wicket text-white hover:bg-cricket-wicket/90 text-lg font-bold shadow-md",
         extra: "bg-cricket-wide text-white hover:bg-cricket-wide/90 text-sm font-medium",
+        retire: "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-orange-400/50 hover:border-orange-300",
         hero: "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground hover:shadow-glow transform hover:scale-105 transition-all duration-300 text-lg font-semibold",
       },
       size: {
