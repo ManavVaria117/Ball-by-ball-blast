@@ -877,7 +877,7 @@ const CricketScorer = () => {
                   </Button>
                 ))}
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <Button
                   variant="boundary"
                   size="touch"
@@ -899,6 +899,13 @@ const CricketScorer = () => {
                 >
                   OUT
                 </Button>
+                <Button
+                  variant="destructive"
+                  size="touch"
+                  onClick={processRetirement}
+                >
+                  RETIRE
+                </Button>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <Button variant="extra" size="sm" onClick={() => processBall(1, true, 'wide')}>
@@ -912,11 +919,6 @@ const CricketScorer = () => {
                 </Button>
                 <Button variant="extra" size="sm" onClick={() => processBall(0, true, 'legbye')}>
                   Leg Bye
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 gap-2 mt-2">
-                <Button variant="destructive" size="sm" onClick={processRetirement}>
-                  Retire Batsman
                 </Button>
               </div>
             </CardContent>
