@@ -263,6 +263,35 @@ const CricketScorer = () => {
     setMatch(updatedMatch);
   };
 
+  // Process retirement (no ball count, no bowler stats affected)
+  const processRetirement = () => {
+    if (!match || !match.strikerId) return;
+
+    const newHistory = [...match.history, JSON.parse(JSON.stringify(match))];
+    const updatedMatch = { ...match };
+    updatedMatch.history = newHistory;
+
+    // Mark striker as out (retired)
+    const battingTeam = match.battingTeam === match.teamA.name ? updatedMatch.teamA : updatedMatch.teamB;
+    const striker = battingTeam.players.find(p => p.id === match.strikerId);
+    if (striker) {
+      striker.isOut = true;
+      striker.dismissalType = 'retired';
+    }
+
+    // Find next batsman - show dialog if more than one available
+    const availableBatsmen = battingTeam.players.filter(p => !p.isOut && p.id !== match.nonStrikerId);
+    if (availableBatsmen.length > 1) {
+      setMatch(updatedMatch);
+      setShowNextBatsmanDialog(true);
+      return;
+    } else if (availableBatsmen.length === 1) {
+      updatedMatch.strikerId = availableBatsmen[0].id;
+    }
+
+    setMatch(updatedMatch);
+  };
+
   const getCurrentBattingTeam = () => {
     if (!match) return null;
     return match.battingTeam === match.teamA.name ? match.teamA : match.teamB;
@@ -885,6 +914,11 @@ const CricketScorer = () => {
                   Leg Bye
                 </Button>
               </div>
+              <div className="grid grid-cols-1 gap-2 mt-2">
+                <Button variant="destructive" size="sm" onClick={processRetirement}>
+                  Retire Batsman
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -1042,7 +1076,7 @@ const CricketScorer = () => {
                         {battingTeam?.players.filter(p => p.balls > 0 || p.isOut).map(player => (
                           <tr key={player.id} className="border-b border-border/50">
                             <td className="p-2 font-medium">
-                              {player.name} {player.isOut ? '(out)' : ''}
+                              {player.name} {player.isOut ? (player.dismissalType === 'retired' ? '(retired)' : '(out)') : ''}
                             </td>
                             <td className="text-center p-2 font-mono">{player.runs}</td>
                             <td className="text-center p-2 font-mono">{player.balls}</td>
